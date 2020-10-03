@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name Buffer)(type Legacy)(uri ${KIPRJMOD}/Buffer.lib)(options "")(descr ""))
+)
