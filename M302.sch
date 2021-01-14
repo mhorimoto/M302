@@ -5,8 +5,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "M302 Measurement Equipment Type Light"
-Date "2020-10-04"
-Rev "1.00"
+Date "2021-01-15"
+Rev "1.10"
 Comp "HOLLY&Co.,Ltd."
 Comment1 "Use W5500 I/F for LAN networking"
 Comment2 "Use IM920 I/F for Radio connection"
@@ -17,13 +17,13 @@ Text Label 5900 3450 1    60   ~ 0
 Vin
 Text Label 6300 3450 1    60   ~ 0
 IOREF
-Text Label 5850 4500 0    60   ~ 0
+Text Label 5200 6300 0    60   ~ 0
 A0
-Text Label 5850 4600 0    60   ~ 0
+Text Label 5200 6500 0    60   ~ 0
 A1
-Text Label 5850 4700 0    60   ~ 0
+Text Label 5200 6700 0    60   ~ 0
 A2
-Text Label 5850 4800 0    60   ~ 0
+Text Label 5200 6900 0    60   ~ 0
 A3
 Text Label 5850 4900 0    60   ~ 0
 A4(SDA)
@@ -35,8 +35,6 @@ Text Label 7500 4800 0    60   ~ 0
 2
 Text Label 7500 4900 0    60   ~ 0
 1(Tx)
-Text Label 7500 4700 0    60   ~ 0
-3(**)
 Text Label 7500 4600 0    60   ~ 0
 4
 Text Label 7500 4500 0    60   ~ 0
@@ -218,11 +216,11 @@ Wire Wire Line
 Wire Wire Line
 	6100 3900 6100 3450
 Wire Wire Line
-	6350 4500 5850 4500
+	6350 4500 5700 4500
 Wire Wire Line
-	6350 4600 5850 4600
+	5800 4600 5800 6450
 Wire Wire Line
-	6350 4700 5850 4700
+	5900 4700 5900 6650
 $Comp
 L Connector_Generic:Conn_01x10 P3
 U 1 1 56D721E0
@@ -246,8 +244,6 @@ Wire Wire Line
 	7150 4900 7500 4900
 Wire Wire Line
 	7150 4800 7500 4800
-Wire Wire Line
-	7150 4700 7500 4700
 Wire Wire Line
 	7150 3500 7250 3500
 Wire Wire Line
@@ -352,16 +348,14 @@ Wire Wire Line
 $Comp
 L power:+5V #PWR0102
 U 1 1 5F77B8D6
-P 1350 2900
-F 0 "#PWR0102" H 1350 2750 50  0001 C CNN
-F 1 "+5V" H 1365 3073 50  0000 C CNN
-F 2 "" H 1350 2900 50  0001 C CNN
-F 3 "" H 1350 2900 50  0001 C CNN
-	1    1350 2900
+P 1350 3100
+F 0 "#PWR0102" H 1350 2950 50  0001 C CNN
+F 1 "+5V" H 1365 3273 50  0000 C CNN
+F 2 "" H 1350 3100 50  0001 C CNN
+F 3 "" H 1350 3100 50  0001 C CNN
+	1    1350 3100
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	1350 2900 1350 3100
 Wire Wire Line
 	3600 4600 3600 4500
 Wire Wire Line
@@ -448,11 +442,7 @@ Connection ~ 3500 5400
 Wire Wire Line
 	3500 5400 3500 4700
 Wire Wire Line
-	4850 5400 5050 5400
-Wire Wire Line
-	5050 5400 5050 4800
-Wire Wire Line
-	5050 4800 6350 4800
+	4850 5400 5150 5400
 Connection ~ 4850 5400
 $Comp
 L Switch:SW_Push SW2
@@ -491,11 +481,6 @@ Wire Wire Line
 	4650 3800 4900 3800
 Wire Wire Line
 	4900 3300 4900 3100
-Wire Wire Line
-	4900 3100 1350 3100
-Connection ~ 1350 3100
-Wire Wire Line
-	1350 3100 1350 4600
 Wire Wire Line
 	4900 3600 4900 3800
 Connection ~ 4900 3800
@@ -609,28 +594,14 @@ Wire Wire Line
 	7150 3600 8750 3600
 NoConn ~ 7500 3400
 NoConn ~ 6300 3450
-NoConn ~ 5850 4700
-NoConn ~ 5850 4600
-NoConn ~ 5850 4500
 NoConn ~ 4750 4500
 NoConn ~ 4450 4500
-$Comp
-L Connector_Generic:Conn_01x06 J7
-U 1 1 5F890362
-P 10150 4750
-F 0 "J7" V 10250 5100 50  0000 R CNN
-F 1 "IM920" V 10250 4750 50  0000 R CNN
-F 2 "Connector_JST:JST_XH_B6B-XH-A_1x06_P2.50mm_Vertical" H 10150 4750 50  0001 C CNN
-F 3 "~" H 10150 4750 50  0001 C CNN
-	1    10150 4750
-	1    0    0    1   
-$EndComp
 $Comp
 L Connector_Generic:Conn_01x02 J8
 U 1 1 5F897A65
 P 1700 1700
 F 0 "J8" H 1618 1917 50  0000 C CNN
-F 1 "PWR" H 1618 1826 50  0000 C CNN
+F 1 "PWR+5V" H 1618 1826 50  0000 C CNN
 F 2 "Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical" H 1700 1700 50  0001 C CNN
 F 3 "~" H 1700 1700 50  0001 C CNN
 	1    1700 1700
@@ -687,72 +658,10 @@ Wire Wire Line
 Connection ~ 1900 2000
 Wire Wire Line
 	1900 2000 1900 2100
-$Comp
-L Buffer:SFE-BOB-12009 U1
-U 1 1 5F77B0BE
-P 9050 5150
-F 0 "U1" H 9050 5175 50  0000 C CNN
-F 1 "SFE-BOB-12009" H 9050 5084 50  0000 C CNN
-F 2 "HOLLY:SFE-BOB-12009" H 9050 5150 50  0001 C CNN
-F 3 "" H 9050 5150 50  0001 C CNN
-	1    9050 5150
-	-1   0    0    1   
-$EndComp
-Wire Wire Line
-	9400 4450 9950 4450
-Wire Wire Line
-	9400 4550 9950 4550
-$Comp
-L power:GND #PWR0109
-U 1 1 5F789935
-P 9650 5500
-F 0 "#PWR0109" H 9650 5250 50  0001 C CNN
-F 1 "GND" H 9650 5350 50  0000 C CNN
-F 2 "" H 9650 5500 50  0000 C CNN
-F 3 "" H 9650 5500 50  0000 C CNN
-	1    9650 5500
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	9650 4750 9950 4750
-$Comp
-L power:+3.3V #PWR0111
-U 1 1 5F7EE56D
-P 9650 4200
-F 0 "#PWR0111" H 9650 4050 50  0001 C CNN
-F 1 "+3.3V" V 9650 4450 50  0000 C CNN
-F 2 "" H 9650 4200 50  0000 C CNN
-F 3 "" H 9650 4200 50  0000 C CNN
-	1    9650 4200
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	9650 4200 9650 4650
-Wire Wire Line
-	9650 4650 9950 4650
-Wire Wire Line
-	9400 4850 9950 4850
-Wire Wire Line
-	9400 4950 9950 4950
-$Comp
-L power:+5V #PWR0112
-U 1 1 5F803107
-P 8500 4200
-F 0 "#PWR0112" H 8500 4050 50  0001 C CNN
-F 1 "+5V" V 8500 4400 50  0000 C CNN
-F 2 "" H 8500 4200 50  0000 C CNN
-F 3 "" H 8500 4200 50  0000 C CNN
-	1    8500 4200
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	8200 4300 8200 4450
 Wire Wire Line
-	8200 4450 8700 4450
-Wire Wire Line
 	7150 4300 8200 4300
-Wire Wire Line
-	8150 4550 8700 4550
 Wire Wire Line
 	7150 4400 8150 4400
 Wire Wire Line
@@ -760,21 +669,11 @@ Wire Wire Line
 Wire Wire Line
 	8100 4500 8100 4850
 Wire Wire Line
-	8100 4850 8700 4850
-Wire Wire Line
 	7150 4500 8100 4500
-Wire Wire Line
-	8050 4600 8050 4950
 Wire Wire Line
 	7150 4600 8050 4600
 Text Notes 8050 5000 0    39   ~ 0
 IM920 RESET
-Text Notes 8100 4900 0    39   ~ 0
-IM920 BUSY
-Text Notes 8150 4600 0    39   ~ 0
-RX(IM920 TX)
-Text Notes 8200 4500 0    39   ~ 0
-TX(IM920 RX)
 $Comp
 L Switch:SW_Push SW3
 U 1 1 5F84E5BD
@@ -800,33 +699,7 @@ $EndComp
 Wire Wire Line
 	8050 6050 8050 5800
 Wire Wire Line
-	8050 5400 8050 4950
-Connection ~ 8050 4950
-Wire Wire Line
-	8050 4950 8700 4950
-Wire Wire Line
-	9650 4750 9650 5300
-Wire Wire Line
-	9400 4750 9650 4750
-Connection ~ 9650 4750
-Wire Wire Line
-	9650 4650 9400 4650
-Connection ~ 9650 4650
-Wire Wire Line
 	8700 3000 8700 3900
-Wire Wire Line
-	8500 4200 8500 4650
-Wire Wire Line
-	8500 4650 8700 4650
-Wire Wire Line
-	8700 4750 8500 4750
-Wire Wire Line
-	8500 4750 8500 5300
-Wire Wire Line
-	8500 5300 9650 5300
-Connection ~ 9650 5300
-Wire Wire Line
-	9650 5300 9650 5500
 Text Notes 4350 3900 0    50   ~ 0
 RESET
 Text Notes 4250 5500 0    50   ~ 0
@@ -860,11 +733,245 @@ Wire Wire Line
 NoConn ~ 5900 3500
 NoConn ~ 7500 4100
 NoConn ~ 7500 4000
-NoConn ~ 7500 4700
 NoConn ~ 7500 4800
 NoConn ~ 7500 4900
 NoConn ~ 7500 5000
 Connection ~ 6250 4200
 Wire Wire Line
 	6250 4200 6250 5150
+$Comp
+L Device:R_US R2
+U 1 1 6000DB41
+P 5150 4450
+F 0 "R2" H 5218 4496 50  0000 L CNN
+F 1 "10k" H 5218 4405 50  0000 L CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 5190 4440 50  0001 C CNN
+F 3 "~" H 5150 4450 50  0001 C CNN
+	1    5150 4450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 6001A3E5
+P 5150 4150
+F 0 "#PWR?" H 5150 4000 50  0001 C CNN
+F 1 "+5V" H 5165 4323 50  0000 C CNN
+F 2 "" H 5150 4150 50  0001 C CNN
+F 3 "" H 5150 4150 50  0001 C CNN
+	1    5150 4150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5150 4300 5150 4150
+Wire Wire Line
+	5150 4600 5150 5400
+Text Label 7500 4700 0    60   ~ 0
+3(**)
+Wire Wire Line
+	7950 4700 7950 5400
+Wire Wire Line
+	7950 5400 5150 5400
+Wire Wire Line
+	7150 4700 7950 4700
+Connection ~ 5150 5400
+Wire Wire Line
+	10350 5300 10350 5500
+Connection ~ 10350 5300
+Wire Wire Line
+	9200 5300 10350 5300
+Wire Wire Line
+	9200 4750 9200 5300
+Wire Wire Line
+	9400 4750 9200 4750
+Wire Wire Line
+	9200 4650 9400 4650
+Wire Wire Line
+	9200 4200 9200 4650
+Connection ~ 10350 4650
+Wire Wire Line
+	10350 4650 10100 4650
+Connection ~ 10350 4750
+Wire Wire Line
+	10100 4750 10350 4750
+Wire Wire Line
+	10350 4750 10350 5300
+Wire Wire Line
+	8050 4950 9400 4950
+Text Notes 8900 4500 0    39   ~ 0
+TX(IM920 RX)
+Text Notes 8850 4600 0    39   ~ 0
+RX(IM920 TX)
+Text Notes 8800 4900 0    39   ~ 0
+IM920 BUSY
+Wire Wire Line
+	8100 4850 9400 4850
+Wire Wire Line
+	8150 4550 9400 4550
+Wire Wire Line
+	8200 4450 9400 4450
+$Comp
+L power:+5V #PWR0112
+U 1 1 5F803107
+P 9200 4200
+F 0 "#PWR0112" H 9200 4050 50  0001 C CNN
+F 1 "+5V" V 9200 4400 50  0000 C CNN
+F 2 "" H 9200 4200 50  0000 C CNN
+F 3 "" H 9200 4200 50  0000 C CNN
+	1    9200 4200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10100 4950 10650 4950
+Wire Wire Line
+	10100 4850 10650 4850
+Wire Wire Line
+	10350 4650 10650 4650
+Wire Wire Line
+	10350 4200 10350 4650
+$Comp
+L power:+3.3V #PWR0111
+U 1 1 5F7EE56D
+P 10350 4200
+F 0 "#PWR0111" H 10350 4050 50  0001 C CNN
+F 1 "+3.3V" V 10350 4450 50  0000 C CNN
+F 2 "" H 10350 4200 50  0000 C CNN
+F 3 "" H 10350 4200 50  0000 C CNN
+	1    10350 4200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10350 4750 10650 4750
+$Comp
+L power:GND #PWR0109
+U 1 1 5F789935
+P 10350 5500
+F 0 "#PWR0109" H 10350 5250 50  0001 C CNN
+F 1 "GND" H 10350 5350 50  0000 C CNN
+F 2 "" H 10350 5500 50  0000 C CNN
+F 3 "" H 10350 5500 50  0000 C CNN
+	1    10350 5500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10100 4550 10650 4550
+Wire Wire Line
+	10100 4450 10650 4450
+$Comp
+L Buffer:SFE-BOB-12009 U1
+U 1 1 5F77B0BE
+P 9750 5150
+F 0 "U1" H 9750 5175 50  0000 C CNN
+F 1 "SFE-BOB-12009" H 9750 5084 50  0000 C CNN
+F 2 "HOLLY:SFE-BOB-12009" H 9750 5150 50  0001 C CNN
+F 3 "" H 9750 5150 50  0001 C CNN
+	1    9750 5150
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x06 J7
+U 1 1 5F890362
+P 10850 4750
+F 0 "J7" V 10950 5100 50  0000 R CNN
+F 1 "IM920" V 10950 4750 50  0000 R CNN
+F 2 "Connector_JST:JST_XH_B6B-XH-A_1x06_P2.50mm_Vertical" H 10850 4750 50  0001 C CNN
+F 3 "~" H 10850 4750 50  0001 C CNN
+	1    10850 4750
+	1    0    0    1   
+$EndComp
+Wire Wire Line
+	8050 4600 8050 4950
+Connection ~ 8050 4950
+Wire Wire Line
+	8050 4950 8050 5400
+$Comp
+L Device:R_US R3
+U 1 1 6005ACD3
+P 8450 4200
+F 0 "R3" H 8518 4246 50  0000 L CNN
+F 1 "10k" H 8518 4155 50  0000 L CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 8490 4190 50  0001 C CNN
+F 3 "~" H 8450 4200 50  0001 C CNN
+	1    8450 4200
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	8300 4200 8050 4200
+Wire Wire Line
+	8050 4200 8050 4600
+Connection ~ 8050 4600
+Wire Wire Line
+	8600 4200 9200 4200
+Connection ~ 9200 4200
+$Comp
+L Connector_Generic:Conn_01x08 J9
+U 1 1 60069A10
+P 5400 6550
+F 0 "J9" H 5318 7067 50  0000 C CNN
+F 1 "ANALOG-IN" H 5318 6976 50  0000 C CNN
+F 2 "Connector_JST:JST_XH_B8B-XH-A_1x08_P2.50mm_Vertical" H 5400 6550 50  0001 C CNN
+F 3 "~" H 5400 6550 50  0001 C CNN
+	1    5400 6550
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	5700 4500 5700 6250
+Wire Wire Line
+	5700 6250 5600 6250
+Wire Wire Line
+	6350 4600 5800 4600
+Wire Wire Line
+	5800 6450 5600 6450
+Wire Wire Line
+	6350 4700 5900 4700
+Wire Wire Line
+	5900 6650 5600 6650
+Wire Wire Line
+	6350 4800 6000 4800
+Wire Wire Line
+	6000 4800 6000 6850
+Wire Wire Line
+	6000 6850 5600 6850
+$Comp
+L power:GND #PWR?
+U 1 1 600ED43B
+P 5700 7100
+F 0 "#PWR?" H 5700 6850 50  0001 C CNN
+F 1 "GND" H 5700 6950 50  0000 C CNN
+F 2 "" H 5700 7100 50  0000 C CNN
+F 3 "" H 5700 7100 50  0000 C CNN
+	1    5700 7100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5600 6350 5700 6350
+Wire Wire Line
+	5700 6350 5700 6550
+Wire Wire Line
+	5600 6550 5700 6550
+Connection ~ 5700 6550
+Wire Wire Line
+	5700 6550 5700 6750
+Wire Wire Line
+	5600 6750 5700 6750
+Connection ~ 5700 6750
+Wire Wire Line
+	5700 6750 5700 6950
+Wire Wire Line
+	5600 6950 5700 6950
+Connection ~ 5700 6950
+Wire Wire Line
+	5700 6950 5700 7100
+Wire Wire Line
+	1350 3100 1350 4600
+$Comp
+L power:+5V #PWR?
+U 1 1 6010C04E
+P 4900 3100
+F 0 "#PWR?" H 4900 2950 50  0001 C CNN
+F 1 "+5V" H 4915 3273 50  0000 C CNN
+F 2 "" H 4900 3100 50  0001 C CNN
+F 3 "" H 4900 3100 50  0001 C CNN
+	1    4900 3100
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
