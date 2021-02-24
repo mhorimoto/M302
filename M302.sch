@@ -6,7 +6,7 @@ encoding utf-8
 Sheet 1 1
 Title "M302 Measurement Equipment Type Light"
 Date "2021-02-24"
-Rev "1.10"
+Rev "1.11"
 Comp "HOLLY&Co.,Ltd."
 Comment1 "Use W5500 I/F for LAN networking"
 Comment2 "Use IM920 I/F for Radio connection"
