@@ -5,12 +5,12 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "M302 Measurement Equipment Type Light"
-Date "2021-01-15"
+Date "2021-02-24"
 Rev "1.10"
 Comp "HOLLY&Co.,Ltd."
 Comment1 "Use W5500 I/F for LAN networking"
 Comment2 "Use IM920 I/F for Radio connection"
-Comment3 ""
+Comment3 "Analog Input 4ch available"
 Comment4 ""
 $EndDescr
 Text Label 5900 3450 1    60   ~ 0
@@ -604,7 +604,7 @@ F 3 "~" H 1700 1700 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	1900 1700 2600 1700
+	1900 1700 2150 1700
 Wire Wire Line
 	3550 1700 3550 1550
 $Comp
@@ -650,7 +650,7 @@ Wire Wire Line
 Wire Wire Line
 	2600 1950 2600 2000
 Wire Wire Line
-	2600 2000 1900 2000
+	2600 2000 2150 2000
 Connection ~ 1900 2000
 Wire Wire Line
 	1900 2000 1900 2100
@@ -966,4 +966,25 @@ F 3 "" H 4900 3100 50  0001 C CNN
 $EndComp
 NoConn ~ 6350 4900
 NoConn ~ 6350 5000
+$Comp
+L Device:C_Small C2
+U 1 1 6036F19A
+P 2150 1850
+F 0 "C2" H 2242 1896 50  0000 L CNN
+F 1 "0.01μF" H 2242 1805 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm" H 2150 1850 50  0001 C CNN
+F 3 "~" H 2150 1850 50  0001 C CNN
+	1    2150 1850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2150 1750 2150 1700
+Connection ~ 2150 1700
+Wire Wire Line
+	2150 1700 2600 1700
+Wire Wire Line
+	2150 1950 2150 2000
+Connection ~ 2150 2000
+Wire Wire Line
+	2150 2000 1900 2000
 $EndSCHEMATC

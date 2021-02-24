@@ -1,4 +1,4 @@
-update=2021年01月13日 19時17分37秒
+update=2021年02月24日 22時47分41秒
 version=1
 last_client=kicad
 [cvpcb]
@@ -240,7 +240,7 @@ dPairViaGap=0.25
 [schematic_editor]
 version=1
 PageLayoutDescrFile=
-PlotDirectoryName=
+PlotDirectoryName=./
 SubpartIdSeparator=0
 SubpartFirstId=65
 NetFmtName=Pcbnew
