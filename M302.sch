@@ -815,7 +815,7 @@ Wire Wire Line
 Wire Wire Line
 	10100 4850 10650 4850
 Wire Wire Line
-	10350 4650 10650 4650
+	10350 4650 10600 4650
 Wire Wire Line
 	10350 4200 10350 4650
 $Comp
@@ -971,7 +971,7 @@ L Device:C_Small C2
 U 1 1 6036F19A
 P 2150 1850
 F 0 "C2" H 2242 1896 50  0000 L CNN
-F 1 "0.01μF" H 2242 1805 50  0000 L CNN
+F 1 "0.1μF" H 2242 1805 50  0000 L CNN
 F 2 "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm" H 2150 1850 50  0001 C CNN
 F 3 "~" H 2150 1850 50  0001 C CNN
 	1    2150 1850
@@ -987,4 +987,50 @@ Wire Wire Line
 Connection ~ 2150 2000
 Wire Wire Line
 	2150 2000 1900 2000
+$Comp
+L Device:CP_Small C3
+U 1 1 60391113
+P 10600 6100
+F 0 "C3" H 10688 6146 50  0000 L CNN
+F 1 "100uF/25V" H 10688 6055 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm" H 10600 6100 50  0001 C CNN
+F 3 "https://akizukidenshi.com/download/ds/rubycon/PK_series.pdf" H 10600 6100 50  0001 C CNN
+	1    10600 6100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C4
+U 1 1 60391E4E
+P 10400 6100
+F 0 "C4" H 10200 6150 50  0000 L CNN
+F 1 "0.1μF" H 10100 6050 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm" H 10400 6100 50  0001 C CNN
+F 3 "~" H 10400 6100 50  0001 C CNN
+	1    10400 6100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10600 4650 10600 6000
+Connection ~ 10600 4650
+Wire Wire Line
+	10600 4650 10650 4650
+Wire Wire Line
+	10400 6000 10600 6000
+Connection ~ 10600 6000
+Wire Wire Line
+	10400 6200 10600 6200
+$Comp
+L power:GND #PWR0116
+U 1 1 603AD11B
+P 10600 6250
+F 0 "#PWR0116" H 10600 6000 50  0001 C CNN
+F 1 "GND" H 10600 6100 50  0000 C CNN
+F 2 "" H 10600 6250 50  0000 C CNN
+F 3 "" H 10600 6250 50  0000 C CNN
+	1    10600 6250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	10600 6250 10600 6200
+Connection ~ 10600 6200
 $EndSCHEMATC
