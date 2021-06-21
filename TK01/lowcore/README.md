@@ -14,17 +14,24 @@ EEPROM初期化プログラム
 |    InAirTemp_Priority      | 15                            |
 |    InAirTemp_Interval      | 10                            |
 |    InAirTemp_Name          | 'InAirTemp',NULL              |
-|    InAirHumid_Type         | 'T'                           |
+|    InAirHumid_Type         | 'H'                           |
 |    InAirHumid_Room         | 1                             |
 |    InAirHumid_Region       | 1                             |
-|    InAirHumid_Order        | N                             |
+|    InAirHumid_Order        | n                             |
 |    InAirHumid_Priority     | 15                            |
 |    InAirHumid_Interval     | 10                            |
 |    InAirHumid_Name         | 'InAirHumid',NULL             |
+|    InIllumi_Type           | 'I'                           |
+|    InIllumi_Room           | 1                             |
+|    InIllumi_Region         | 1                             |
+|    InIllumi_Order          | n                             |
+|    InIllumi_Priority       | 15                            |
+|    InIllumi_Interval       | 10                            |
+|    InIllumi_Name           | 'InIllumi',NULL               |
 |    cnd Type (dummy)        | 'c'                           |
 |    cnd Room                | 1                             |
 |    cnd Region              | 1                             |
-|    cnd Order               | N                             |
+|    cnd Order               | n                             |
 |    cnd Priority            | 29                            |
 |    cnd Interval            | 1                             |
 |    cnd Name                | 'cnd',NULL*4                  |
