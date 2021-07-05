@@ -29,8 +29,15 @@ void get_mcusr(void) {
   wdt_disable();
 }
 
+#define  UECS_PORT  16520
+#define  pUECSID      0
+#define  pMACADDR     6
+#define  pINAIRTEMP  16
+#define  pINAIRHUMID 33
+#define  pINILLUMI   51
+#define  pCND        67
 
-const char VERSION[16] PROGMEM = "THCP Ver:A00";
+const char VERSION[16] PROGMEM = "\xbd\xcf\xc9\xb3\xbc\xde\xad\xb8 V006";
 
 char uecsid[6], uecstext[180],strIP[16],linebuf[65];
 byte lineptr = 0;
@@ -38,9 +45,6 @@ byte lineptr = 0;
 /////////////////////////////////////
 // Hardware Define
 /////////////////////////////////////
-Adafruit_MCP9600 mcp[8];
-int mcp96_addr[]={0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67};
-float thermocouple[8];
 
 LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 char lcdtext[4][17];
@@ -56,15 +60,14 @@ volatile int period60sec = 0;
 void setup(void) {
   int i;
   const char *ids PROGMEM = "%s:%02X%02X%02X%02X%02X%02X";
-  extern void init_mcp(void);
   extern void lcdout(int,int,int);
   
   lcd.init();
   lcd.backlight();
   configure_wdt();
   pinMode(2,INPUT_PULLUP);
-  EEPROM.get(0x00,uecsid);
-  EEPROM.get(0x06,macaddr);
+  EEPROM.get(pUECSID,uecsid);
+  EEPROM.get(pMACADDR,macaddr);
   for(i=0;i<16;i++) {
     lcdtext[0][i] = pgm_read_byte(&(VERSION[i]));
   }
@@ -94,8 +97,6 @@ void setup(void) {
   }
   wdt_reset();
   delay(1000);
-  init_mcp();
-  delay(2000);
   //
   // Setup Timer1 Interrupt
   //
@@ -121,11 +122,12 @@ void(*resetFunc)(void) = 0;
 /////////////////////////////////
 void loop() {
   int i,ia,ta,tb;
-  byte room,region,priority;
-  int  order,interval;
+  byte room,region,priority,interval;
+  int  order;
   int  inchar ;
+  float ther = 12.34;
   static byte s = 0;
-  char name[7],dname[10],val[6];
+  char name[10],dname[11],val[6];
   extern void lcdout(int,int,int);
   extern int setParam(char *);
   extern void dumpLowCore(void);
@@ -135,78 +137,106 @@ void loop() {
   const char *ids PROGMEM = "%s:%02X%02X%02X%02X%02X%02X";
 
 
-  wdt_reset();
-  //////////////////////////////////////////////////////////////
-  // Green Button Operations
-  //////////////////////////////////////////////////////////////
-  if ( digitalRead(2) == LOW ) {
-    if ( s == 0 ) {
-      s = 1;
-      for(i=0;i<16;i++) {
-	lcdtext[0][i] = pgm_read_byte(&(VERSION[i]));
-      }
-      lcdtext[0][i] = 0;
-      sprintf(lcdtext[1],ids,"ID",
-	      uecsid[0],uecsid[1],uecsid[2],uecsid[3],uecsid[4],uecsid[5]);
-    } else {
-      s = 0;
-      sprintf(lcdtext[0],ids,"HW",
-	      macaddr[0],macaddr[1],macaddr[2],macaddr[3],macaddr[4],macaddr[5]);
-      sprintf(strIP,"%d.%d.%d.%d",localIP[0],localIP[1],localIP[2],localIP[3]);
-      sprintf(lcdtext[1],"%s",strIP);
-    }
-    lcdout(0,1,1);
-    delay(150);
-  }
-  //////////////////////////////////////////////////////////////
-  if ( Serial.available() > 0 ) {
-    inchar = Serial.read();
-    if (( inchar == 0x13 )||( inchar == 0x0a)||( lineptr > 63)) {
-      if ( !strcmp(linebuf,"d") ) {
-	dumpLowCore();
-      } else if ( !strncmp(linebuf,"s ",2 )) {
-	if ( setParam(linebuf) != 0 ) {
-	  Serial.println(F("BAD"));
-	} else {
-	  Serial.println(F("OK"));
-	}
-      } else if ( !strcmp(linebuf,"reset" )) {
-	resetFunc();
-      } else {
-	Serial.print(linebuf);
-	Serial.println(F(" ?"));
-      }
-      lineptr = 0;
-    } else {
-      linebuf[lineptr] = (char)inchar;
-      lineptr++;
-    }
-    linebuf[lineptr] = (char)NULL;
-  }
+   wdt_reset();
+//   //////////////////////////////////////////////////////////////
+//   // Green Button Operations
+//   //////////////////////////////////////////////////////////////
+//   if ( digitalRead(2) == LOW ) {
+//     if ( s == 0 ) {
+//       s = 1;
+//       for(i=0;i<16;i++) {
+// 	lcdtext[0][i] = pgm_read_byte(&(VERSION[i]));
+//       }
+//       lcdtext[0][i] = 0;
+//       sprintf(lcdtext[1],ids,"ID",
+// 	      uecsid[0],uecsid[1],uecsid[2],uecsid[3],uecsid[4],uecsid[5]);
+//     } else {
+//       s = 0;
+//       sprintf(lcdtext[0],ids,"HW",
+// 	      macaddr[0],macaddr[1],macaddr[2],macaddr[3],macaddr[4],macaddr[5]);
+//       sprintf(strIP,"%d.%d.%d.%d",localIP[0],localIP[1],localIP[2],localIP[3]);
+//       sprintf(lcdtext[1],"%s",strIP);
+//     }
+//     lcdout(0,1,1);
+//     delay(150);
+//   }
+//   //////////////////////////////////////////////////////////////
+//   if ( Serial.available() > 0 ) {
+//     inchar = Serial.read();
+//     if (( inchar == 0x13 )||( inchar == 0x0a)||( lineptr > 63)) {
+//       if ( !strcmp(linebuf,"d") ) {
+// 	dumpLowCore();
+//       } else if ( !strncmp(linebuf,"s ",2 )) {
+// 	if ( setParam(linebuf) != 0 ) {
+// 	  Serial.println(F("BAD"));
+// 	} else {
+// 	  Serial.println(F("OK"));
+// 	}
+//       } else if ( !strcmp(linebuf,"reset" )) {
+// 	resetFunc();
+//       } else {
+// 	Serial.print(linebuf);
+// 	Serial.println(F(" ?"));
+//       }
+//       lineptr = 0;
+//     } else {
+//       linebuf[lineptr] = (char)inchar;
+//       lineptr++;
+//     }
+//     linebuf[lineptr] = (char)NULL;
+//   }
   // 10 sec interval
   if (period10sec==1) {
     wdt_reset();
     period10sec = 0;
-    for(i=1;i<9;i++) {
-      ia = i*0x10;
-      EEPROM.get(ia+0x01,room);
-      EEPROM.get(ia+0x02,region);
-      EEPROM.get(ia+0x03,order);
-      EEPROM.get(ia+0x05,priority);
-      EEPROM.get(ia+0x06,interval);
-      EEPROM.get(ia+0x08,name);
-      ta = (int)thermocouple[(i-1)];
-      tb = (int)((thermocouple[(i-1)]-ta)*100);
-      lcdout(0,1,0);
-      sprintf(dname,"%s.%d",name,i);
-      sprintf(val,"%d.%02d",ta,tb);
-      sprintf(uecstext,xmlDT,dname,room,region,order,priority,val,strIP);
-      // <?xml version="1.0"?><UECS ver="1.00-E10"><DATA type="TCTemp.2.mIC" room="1" region="1" order="1" priority="15">25.87</DATA><IP>192.168.38.126</IP></UECS>
-
-      Udp16520.beginPacket(broadcastIP,16520);
-      Udp16520.write(uecstext);
-      Udp16520.endPacket();
+    ia = pINAIRTEMP;
+    EEPROM.get(ia+0x01,room);
+    EEPROM.get(ia+0x02,region);
+    EEPROM.get(ia+0x03,order);
+    EEPROM.get(ia+0x05,priority);
+    EEPROM.get(ia+0x06,interval);
+    EEPROM.get(ia+0x07,name);
+    for(i=0;i<10;i++) {
+      dname[i] = name[i];
+      if (name[i]==NULL) break;
     }
+    dname[i] = NULL;
+    ta = (int)ther;
+    tb = (int)((ther-ta)*100);
+    sprintf(val,"%d.%02d",ta,tb);
+    sprintf(uecstext,xmlDT,dname,room,region,order,priority,val,strIP);
+    Udp16520.beginPacket(broadcastIP,16520);
+    Udp16520.write(uecstext);
+    Udp16520.endPacket();
+    ia = pINAIRHUMID;
+    EEPROM.get(ia+0x01,room);
+    //    Serial.print("ROOM=");
+    //    Serial.println(room,DEC);
+    EEPROM.get(ia+0x02,region);
+    //    Serial.print("REGION=");
+    //    Serial.println(region,DEC);
+    EEPROM.get(ia+0x03,order);
+    //    Serial.print("ORDER=");
+    //    Serial.println(order,DEC);
+    EEPROM.get(ia+0x05,priority);
+    //    Serial.print("PRIO=");
+    //    Serial.println(priority,DEC);
+    EEPROM.get(ia+0x06,interval);
+    //    Serial.print("INTV=");
+    //    Serial.println(interval,DEC);
+    EEPROM.get(ia+0x07,name);
+    //    Serial.print("Name=");
+    ta = (int)78;
+    for(i=0;i<10;i++) {
+      dname[i] = name[i];
+    }
+    dname[i] = NULL;
+    //    Serial.println(dname);
+    sprintf(val,"%d",ta);
+    sprintf(uecstext,xmlDT,dname,room,region,order,priority,val,strIP);
+    Udp16520.beginPacket(broadcastIP,16520);
+    Udp16520.write(uecstext);
+    Udp16520.endPacket();
   }
   // 1 min interval
   if (period60sec==1) {
@@ -216,21 +246,22 @@ void loop() {
   // 1 sec interval
   if (period1sec==1) {
     period1sec = 0;
-    EEPROM.get(0x91,room);
-    EEPROM.get(0x92,region);
-    EEPROM.get(0x93,order);
-    EEPROM.get(0x95,priority);
+    ia = pCND;
+    EEPROM.get(ia+1,room);
+    EEPROM.get(ia+2,region);
+    EEPROM.get(ia+3,order);
+    EEPROM.get(ia+5,priority);
     sprintf(uecstext,xmlDT,"cnd",room,region,order,priority,"0",strIP);
     Udp16520.beginPacket(broadcastIP,16520);
     Udp16520.write(uecstext);
     Udp16520.endPacket();
-    for(i=0;i<8;i++) {
-      thermocouple[i] = mcp[i].readThermocouple();
-    }
-    sprintf(lcdtext[0],thdisp,
-	    (int)thermocouple[0],(int)thermocouple[1],(int)thermocouple[2],(int)thermocouple[3]);
-    sprintf(lcdtext[1],thdisp,
-	    (int)thermocouple[4],(int)thermocouple[5],(int)thermocouple[6],(int)thermocouple[7]);
+    //    for(i=0;i<8;i++) {
+    //      thermocouple[i] = mcp[i].readThermocouple();
+    //    }
+    //    sprintf(lcdtext[0],thdisp,
+    //	    (int)thermocouple[0],(int)thermocouple[1],(int)thermocouple[2],(int)thermocouple[3]);
+    //    sprintf(lcdtext[1],thdisp,
+    //	    (int)thermocouple[4],(int)thermocouple[5],(int)thermocouple[6],(int)thermocouple[7]);
   }
   wdt_reset();
 }
