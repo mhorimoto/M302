@@ -13,7 +13,7 @@
 
 void setup(void) {
   unsigned int i,j,r,a,u;
-  byte t;
+  byte t,room;
   char c,name[8],z[4];
   byte uecsid[6]={0x10,0x10,0x0c,0x00,0x00,0x0A},uecsrd[6];
   byte macadd[6]={0x02,0xa2,0x73,0x0A,0xff,0xff};
@@ -24,7 +24,9 @@ void setup(void) {
     'c',1,1,1,0,29,1, 0,'c','n','d',0
   };
   Serial.begin(115200);
-  Serial.println("EEPROM SETTING for TK01 VER 0.01");
+  Serial.println("EEPROM SETTING for TK01 VER 0.02");
+  pinMode(3,INPUT_PULLUP);   // D400 RESET BUTTON
+  delay(100);
   EEPROM.get(0x0,uecsrd);
   for(i=0;i<6;i++) {
     if (uecsrd[i]!=uecsid[i]) {
@@ -34,8 +36,11 @@ void setup(void) {
       r = 0;  // 書き込まない
     }
   }
+  if (digitalRead(3)==LOW) {
+    r = 1;
+  }
   if (r==0) { // 書き込み済ならば表示だけを行って終了
-    Serial.println("FINE DID");
+    Serial.println("FINE DID NOT WRITE");
     Serial.println("HEXDATA:");
     for(j=0;j<5;j++) {
       sprintf(z,"0x%03X:",j*0x10);
@@ -57,12 +62,15 @@ void setup(void) {
 	  Serial.println("END");
 	  Serial.end();
 	  while(1) {
-	    u = 0;
+	    u = 0;    // PROGRAM END HERE
 	  }
 	}
       }
     }
   }
+  //
+  // DATA WRITE START HERE
+  //
   EEPROM.put(0x0,uecsid);
   Serial.println("WRITE DONE");
   Serial.print("UECSID:");
@@ -102,14 +110,11 @@ void setup(void) {
     Serial.print(EEPROM.read(6+i),HEX);
     if (i<5) Serial.print(":");
   }
-  data[3]  = macadd[5];
-  data[4]  = macadd[4];
-  data[20] = macadd[5];
-  data[21] = macadd[4];
-  data[38] = macadd[5];
-  data[39] = macadd[4];
-  data[54] = macadd[5];
-  data[55] = macadd[4];
+  room = (macadd[5]+30)&0x7f;
+  data[0x01] = room ; // InAirTemp
+  data[0x12] = room ; // InAirHumid
+  data[0x24] = room ; // InIllumi
+  data[0x34] = room ; // cnd
   Serial.println("");
   EEPROM.put(0x10,data);
   Serial.println("DATA WROTE");
