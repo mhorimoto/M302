@@ -18,6 +18,7 @@
 #include <Wire.h>
 #include <Adafruit_I2CDevice.h>
 #include <Adafruit_I2CRegister.h>
+#include "Adafruit_SHT31.h"
 
 uint8_t mcusr_mirror __attribute__ ((section (".noinit")));
 void get_mcusr(void)	 \
@@ -35,12 +36,15 @@ void get_mcusr(void) {
 #define  pINAIRTEMP  16
 #define  pINAIRHUMID 33
 #define  pINILLUMI   51
-#define  pCND        67
+#define  pCND        0x43
 
-const char VERSION[16] PROGMEM = "\xbd\xcf\xc9\xb3\xbc\xde\xad\xb8 V006";
+const char VERSION[16] PROGMEM = "\xbd\xcf\xc9\xb3\xbc\xde\xad\xb8 V020";
 
 char uecsid[6], uecstext[180],strIP[16],linebuf[65];
 byte lineptr = 0;
+int  sht31addr = 0x44;  // Default SHT31 I2C Address
+bool enableHeater = false;
+char api[] = "api.smart-agri.jp";
 
 /////////////////////////////////////
 // Hardware Define
@@ -49,9 +53,12 @@ byte lineptr = 0;
 LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 char lcdtext[4][17];
 
+Adafruit_SHT31 sht31 = Adafruit_SHT31();
+
 byte macaddr[6];
 IPAddress localIP,broadcastIP,subnetmaskIP,remoteIP;
 EthernetUDP Udp16520; //,Udp16529;
+EthernetClient EthClient; // GIS Client
 
 volatile int period1sec = 0;
 volatile int period10sec = 0;
@@ -77,7 +84,37 @@ void setup(void) {
   lcdout(0,1,1);
   Serial.begin(115200);
   Serial.println(lcdtext[0]);
-  delay(1500);
+  Serial.println("ST1"); // SHT31 test
+  if (! sht31.begin(sht31addr)) {   // Set to 0x45 for alternate i2c addr
+    Serial.println(F("ET1"));       // NO SHT31 at 0x44
+    //    sprintf(lcdtext[3],"NO SHT31 AT 0x44 ");
+    //    lcdout(0,3,0);
+    for(i=0;i<10;i++) {
+      delay(100);
+      if (sht31.begin(sht31addr)) {
+	Serial.println(F("ST2"))    // SHT31 at 0x44
+	//	sprintf(lcdtext[3],"SHT31 AT 0x44   ");
+	//	lcdout(0,3,0);
+	break;
+      }
+    }
+    if (i==10) {
+      Serial.println(F("ET2")); // NOT FOUND SHT31 SKIP
+	  sprintf(lcdtext[3],"NO SHT31 SKIP   ");
+	  lcdout(0,3,0);
+	  sht31addr = 0;
+	}
+      }
+    }
+  }
+
+  //Serial.print(F("HEAT State: "));
+  //  if (sht31.isHeaterEnabled())
+  //    Serial.println("ENABLED");
+  //  else
+  //    Serial.println("DISABLED");
+
+  delay(500);
   Ethernet.init(10);
   if (Ethernet.begin(macaddr)==0) {
     sprintf(lcdtext[1],"NFL");
@@ -125,7 +162,7 @@ void loop() {
   byte room,region,priority,interval;
   int  order;
   int  inchar ;
-  float ther = 12.34;
+  float ther,humi;
   static byte s = 0;
   char name[10],dname[11],val[6];
   extern void lcdout(int,int,int);
@@ -135,7 +172,11 @@ void loop() {
   const char *xmlDT PROGMEM = "<?xml version=\"1.0\"?><UECS ver=\"1.00-E10\"><DATA type=\"%s.mIC\" room=\"%d\" region=\"%d\" order=\"%d\" priority=\"%d\">%s</DATA><IP>%s</IP></UECS>";
   const char *thdisp PROGMEM = "%3d %3d %3d %3d";
   const char *ids PROGMEM = "%s:%02X%02X%02X%02X%02X%02X";
-
+  
+  if (EthClient.available()) {
+    char c = EthClient.read();
+    Serial.write(c);
+  }
 
    wdt_reset();
 //   //////////////////////////////////////////////////////////////
@@ -189,54 +230,19 @@ void loop() {
   if (period10sec==1) {
     wdt_reset();
     period10sec = 0;
-    ia = pINAIRTEMP;
-    EEPROM.get(ia+0x01,room);
-    EEPROM.get(ia+0x02,region);
-    EEPROM.get(ia+0x03,order);
-    EEPROM.get(ia+0x05,priority);
-    EEPROM.get(ia+0x06,interval);
-    EEPROM.get(ia+0x07,name);
-    for(i=0;i<10;i++) {
-      dname[i] = name[i];
-      if (name[i]==NULL) break;
+    if (sht31addr>0) {
+      ther = sht31.readTemperature();
+      humi = sht31.readHumidity();
+      ia = pINAIRTEMP;
+      ta = (int)ther;
+      tb = (int)((ther-ta)*100);
+      sprintf(val,"%d.%02d",ta,tb);
+      uecsSendData(ia,xmlDT,val);
+      ia = pINAIRHUMID;
+      sprintf(val,"%d",(int)humi);
+      uecsSendData(ia,xmlDT,val);
     }
-    dname[i] = NULL;
-    ta = (int)ther;
-    tb = (int)((ther-ta)*100);
-    sprintf(val,"%d.%02d",ta,tb);
-    sprintf(uecstext,xmlDT,dname,room,region,order,priority,val,strIP);
-    Udp16520.beginPacket(broadcastIP,16520);
-    Udp16520.write(uecstext);
-    Udp16520.endPacket();
-    ia = pINAIRHUMID;
-    EEPROM.get(ia+0x01,room);
-    //    Serial.print("ROOM=");
-    //    Serial.println(room,DEC);
-    EEPROM.get(ia+0x02,region);
-    //    Serial.print("REGION=");
-    //    Serial.println(region,DEC);
-    EEPROM.get(ia+0x03,order);
-    //    Serial.print("ORDER=");
-    //    Serial.println(order,DEC);
-    EEPROM.get(ia+0x05,priority);
-    //    Serial.print("PRIO=");
-    //    Serial.println(priority,DEC);
-    EEPROM.get(ia+0x06,interval);
-    //    Serial.print("INTV=");
-    //    Serial.println(interval,DEC);
-    EEPROM.get(ia+0x07,name);
-    //    Serial.print("Name=");
-    ta = (int)78;
-    for(i=0;i<10;i++) {
-      dname[i] = name[i];
-    }
-    dname[i] = NULL;
-    //    Serial.println(dname);
-    sprintf(val,"%d",ta);
-    sprintf(uecstext,xmlDT,dname,room,region,order,priority,val,strIP);
-    Udp16520.beginPacket(broadcastIP,16520);
-    Udp16520.write(uecstext);
-    Udp16520.endPacket();
+    gisSendData(ia,val);
   }
   // 1 min interval
   if (period60sec==1) {
@@ -247,21 +253,7 @@ void loop() {
   if (period1sec==1) {
     period1sec = 0;
     ia = pCND;
-    EEPROM.get(ia+1,room);
-    EEPROM.get(ia+2,region);
-    EEPROM.get(ia+3,order);
-    EEPROM.get(ia+5,priority);
-    sprintf(uecstext,xmlDT,"cnd",room,region,order,priority,"0",strIP);
-    Udp16520.beginPacket(broadcastIP,16520);
-    Udp16520.write(uecstext);
-    Udp16520.endPacket();
-    //    for(i=0;i<8;i++) {
-    //      thermocouple[i] = mcp[i].readThermocouple();
-    //    }
-    //    sprintf(lcdtext[0],thdisp,
-    //	    (int)thermocouple[0],(int)thermocouple[1],(int)thermocouple[2],(int)thermocouple[3]);
-    //    sprintf(lcdtext[1],thdisp,
-    //	    (int)thermocouple[4],(int)thermocouple[5],(int)thermocouple[6],(int)thermocouple[7]);
+    uecsSendData(ia,xmlDT,"0");
   }
   wdt_reset();
 }
@@ -300,4 +292,38 @@ void configure_wdt(void) {
                                    //  2 seconds: 0b000111
                                    //  4 seconds: 0b100000
                                    //  8 seconds: 0b100001
+}
+
+void uecsSendData(int a,char *xmlDT,char *val) {
+  byte room,region,priority,interval;
+  int  order,i;
+  char name[10],dname[11]; // ,val[6];
+  EEPROM.get(a+0x01,room);
+  EEPROM.get(a+0x02,region);
+  EEPROM.get(a+0x03,order);
+  EEPROM.get(a+0x05,priority);
+  EEPROM.get(a+0x06,interval);
+  EEPROM.get(a+0x07,name);
+  for(i=0;i<10;i++) {
+    dname[i] = name[i];
+    if (name[i]==NULL) break;
+  }
+  dname[i] = NULL;
+  sprintf(uecstext,xmlDT,dname,room,region,order,priority,val,strIP);
+  Udp16520.beginPacket(broadcastIP,16520);
+  Udp16520.write(uecstext);
+  Udp16520.endPacket();
+}
+
+void gisSendData(int a,char *val) {
+  EthClient.stop();
+  if (EthClient.connect(api,80)) {
+    EthClient.println("GET /b.html HTTP/1.1");
+    EthClient.println("Host: api.smart-agri.jp");
+    EthClient.println("User-Agent: arduino");
+    EthClient.println("Connection: close");
+    EthClient.println();
+  } else {
+    Serial.println("connection failed");
+  }
 }

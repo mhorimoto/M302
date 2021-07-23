@@ -21,10 +21,10 @@ void setup(void) {
     'T',1,1,1,0,15,10,'I','n','A','i','r','T','e','m','p',0,
     'H',1,1,1,0,15,10,'I','n','A','i','r','H','u','m','i','d',0,
     'I',1,1,1,0,15,10,'I','n','I','l','l','u','m','i',0,
-    'c',1,1,1,0,29,1, 0,'c','n','d',0
+    'c',1,1,1,0,29, 1,'c','n','d',0
   };
   Serial.begin(115200);
-  Serial.println("EEPROM SETTING for TK01 VER 0.02");
+  Serial.println("EEPROM SETTING for TK01 VER 0.03");
   pinMode(3,INPUT_PULLUP);   // D400 RESET BUTTON
   delay(100);
   EEPROM.get(0x0,uecsrd);
