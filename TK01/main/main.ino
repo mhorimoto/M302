@@ -37,10 +37,11 @@ void get_mcusr(void) {
 #define  pINAIRHUMID 33
 #define  pINILLUMI   51
 #define  pCND        0x43
+#define  delayMillis 5000UL // 5sec
 
-const char VERSION[16] PROGMEM = "\xbd\xcf\xc9\xb3\xbc\xde\xad\xb8 V020";
+const char VERSION[16] PROGMEM = "\xbd\xcf\xc9\xb3\xbc\xde\xad\xb8 V040";
 
-char uecsid[6], uecstext[180],strIP[16],linebuf[65];
+char uecsid[6], uecstext[180],strIP[16],linebuf[80];
 byte lineptr = 0;
 int  sht31addr = 0x44;  // Default SHT31 I2C Address
 bool enableHeater = false;
@@ -51,7 +52,7 @@ char api[] = "api.smart-agri.jp";
 /////////////////////////////////////
 
 LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-char lcdtext[4][17];
+char lcdtext[5][17];
 
 Adafruit_SHT31 sht31 = Adafruit_SHT31();
 
@@ -87,33 +88,20 @@ void setup(void) {
   Serial.println("ST1"); // SHT31 test
   if (! sht31.begin(sht31addr)) {   // Set to 0x45 for alternate i2c addr
     Serial.println(F("ET1"));       // NO SHT31 at 0x44
-    //    sprintf(lcdtext[3],"NO SHT31 AT 0x44 ");
-    //    lcdout(0,3,0);
     for(i=0;i<10;i++) {
       delay(100);
       if (sht31.begin(sht31addr)) {
-	Serial.println(F("ST2"))    // SHT31 at 0x44
-	//	sprintf(lcdtext[3],"SHT31 AT 0x44   ");
-	//	lcdout(0,3,0);
+	Serial.println(F("ST2"));    // SHT31 at 0x44
 	break;
       }
     }
     if (i==10) {
       Serial.println(F("ET2")); // NOT FOUND SHT31 SKIP
-	  sprintf(lcdtext[3],"NO SHT31 SKIP   ");
-	  lcdout(0,3,0);
-	  sht31addr = 0;
-	}
-      }
+      strcpy(lcdtext[3],"NO SHT31 SKIP   ");
+      lcdout(0,3,0);
+      sht31addr = 0;
     }
   }
-
-  //Serial.print(F("HEAT State: "));
-  //  if (sht31.isHeaterEnabled())
-  //    Serial.println("ENABLED");
-  //  else
-  //    Serial.println("DISABLED");
-
   delay(500);
   Ethernet.init(10);
   if (Ethernet.begin(macaddr)==0) {
@@ -128,7 +116,7 @@ void setup(void) {
 	    macaddr[0],macaddr[1],macaddr[2],macaddr[3],macaddr[4],macaddr[5]);
     sprintf(strIP,"%d.%d.%d.%d",localIP[0],localIP[1],localIP[2],localIP[3]);
     sprintf(lcdtext[3],"%s",strIP);
-    sprintf(lcdtext[0],"%d.%d.%d.%d",broadcastIP[0],broadcastIP[1],broadcastIP[2],broadcastIP[3]);
+    //    sprintf(lcdtext[0],"%d.%d.%d.%d",broadcastIP[0],broadcastIP[1],broadcastIP[2],broadcastIP[3]);
     lcdout(2,3,1);
     Udp16520.begin(16520);
   }
@@ -145,10 +133,10 @@ void setup(void) {
   //
   // Opening Messages
   //
-  Serial.println(lcdtext[1]);
-  Serial.println(lcdtext[2]);
-  Serial.println(lcdtext[3]);
-  Serial.println(lcdtext[0]);
+  //  Serial.println(lcdtext[1]);
+  //  Serial.println(lcdtext[2]);
+  //  Serial.println(lcdtext[3]);
+  //  Serial.println(lcdtext[0]);
 }
 
 /////////////////////////////////
@@ -158,49 +146,28 @@ void(*resetFunc)(void) = 0;
 
 /////////////////////////////////
 void loop() {
+  static int k=0;
   int i,ia,ta,tb;
   byte room,region,priority,interval;
   int  order;
   int  inchar ;
   float ther,humi;
-  static byte s = 0;
+  //  static byte s = 0;
   char name[10],dname[11],val[6];
   extern void lcdout(int,int,int);
   extern int setParam(char *);
   extern void dumpLowCore(void);
   
   const char *xmlDT PROGMEM = "<?xml version=\"1.0\"?><UECS ver=\"1.00-E10\"><DATA type=\"%s.mIC\" room=\"%d\" region=\"%d\" order=\"%d\" priority=\"%d\">%s</DATA><IP>%s</IP></UECS>";
-  const char *thdisp PROGMEM = "%3d %3d %3d %3d";
+  //  const char *thdisp PROGMEM = "%3d %3d %3d %3d";
   const char *ids PROGMEM = "%s:%02X%02X%02X%02X%02X%02X";
   
-  if (EthClient.available()) {
-    char c = EthClient.read();
-    Serial.write(c);
-  }
+  //if (EthClient.available()) {
+  //    char c = EthClient.read();
+  //    Serial.write(c);
+  //  }
 
    wdt_reset();
-//   //////////////////////////////////////////////////////////////
-//   // Green Button Operations
-//   //////////////////////////////////////////////////////////////
-//   if ( digitalRead(2) == LOW ) {
-//     if ( s == 0 ) {
-//       s = 1;
-//       for(i=0;i<16;i++) {
-// 	lcdtext[0][i] = pgm_read_byte(&(VERSION[i]));
-//       }
-//       lcdtext[0][i] = 0;
-//       sprintf(lcdtext[1],ids,"ID",
-// 	      uecsid[0],uecsid[1],uecsid[2],uecsid[3],uecsid[4],uecsid[5]);
-//     } else {
-//       s = 0;
-//       sprintf(lcdtext[0],ids,"HW",
-// 	      macaddr[0],macaddr[1],macaddr[2],macaddr[3],macaddr[4],macaddr[5]);
-//       sprintf(strIP,"%d.%d.%d.%d",localIP[0],localIP[1],localIP[2],localIP[3]);
-//       sprintf(lcdtext[1],"%s",strIP);
-//     }
-//     lcdout(0,1,1);
-//     delay(150);
-//   }
 //   //////////////////////////////////////////////////////////////
 //   if ( Serial.available() > 0 ) {
 //     inchar = Serial.read();
@@ -231,23 +198,33 @@ void loop() {
     wdt_reset();
     period10sec = 0;
     if (sht31addr>0) {
-      ther = sht31.readTemperature();
-      humi = sht31.readHumidity();
+      //      ther = sht31.readTemperature();
       ia = pINAIRTEMP;
-      ta = (int)ther;
-      tb = (int)((ther-ta)*100);
-      sprintf(val,"%d.%02d",ta,tb);
-      uecsSendData(ia,xmlDT,val);
-      ia = pINAIRHUMID;
-      sprintf(val,"%d",(int)humi);
-      uecsSendData(ia,xmlDT,val);
+      getSHTdata(&val[0],pINAIRTEMP,0);  // 整数型にしない
+      //     Serial.println(val);
+      sprintf(linebuf,"T=%sC",val);
+      uecsSendData(pINAIRTEMP,xmlDT,val);
+      getSHTdata(&val[0],pINAIRHUMID,0);  // 整数型
+      uecsSendData(pINAIRHUMID,xmlDT,val);
+      sprintf(lcdtext[4],"%s H=%s%%",linebuf,val);
+    } else {
+      strcpy(lcdtext[4],("NO SHT SENSOR"));
     }
-    gisSendData(ia,val);
+    k++;
+    if (k>3) k=0;
+    lcdout(k,4,1);
   }
   // 1 min interval
   if (period60sec==1) {
-    wdt_reset();
     period60sec = 0;
+    wdt_reset();
+    if (sht31addr>0) {
+      getSHTdata(&val[0],pINAIRTEMP,1); // 小数点下1桁の整数型
+      ia = gisSendData(pINAIRTEMP,16,val);
+      wdt_reset();
+      getSHTdata(&val[0],pINAIRHUMID,0); // 整数型
+      ia = gisSendData(pINAIRHUMID,17,val);
+    }
   }
   // 1 sec interval
   if (period1sec==1) {
@@ -315,15 +292,91 @@ void uecsSendData(int a,char *xmlDT,char *val) {
   Udp16520.endPacket();
 }
 
-void gisSendData(int a,char *val) {
+byte gisSendData(int a,int sk,char *val) {
+  int connectLoop = 0;
+  int inChar;
+  char headline[20];
+  const char *gisDT PROGMEM = "M=%02X%02X.%02X%02X.%02X%02X&I=%d&P=%d&V=%s&RM=%d&RE=%d&OD=%d&PR=%d&TP=%s.mIC";
+  byte room,region,priority,interval;
+  int  order,i;
+  char name[10],dname[11];
+
+  lcd.setCursor(15,1);
+  lcd.print("W");
+  EEPROM.get(a+0x01,room);
+  EEPROM.get(a+0x02,region);
+  EEPROM.get(a+0x03,order);
+  EEPROM.get(a+0x05,priority);
+  EEPROM.get(a+0x06,interval);
+  EEPROM.get(a+0x07,name);
+  for(i=0;i<10;i++) {
+    dname[i] = name[i];
+    if (name[i]==NULL) break;
+  }
+  dname[i] = NULL;
+
+  wdt_reset();
+  sprintf(linebuf,gisDT,macaddr[0],macaddr[1],macaddr[2],macaddr[3],macaddr[4],macaddr[5],
+	  order,sk,val,room,region,order,priority,dname);
+  //  Serial.println(linebuf);
   EthClient.stop();
   if (EthClient.connect(api,80)) {
-    EthClient.println("GET /b.html HTTP/1.1");
-    EthClient.println("Host: api.smart-agri.jp");
-    EthClient.println("User-Agent: arduino");
-    EthClient.println("Connection: close");
-    EthClient.println();
+    EthClient.println(F("POST /farmem/rx/rxdata.php HTTP/1.1"));
+    EthClient.println(F("Host: api.smart-agri.jp"));
+    EthClient.println(F("Connection: close\r\nContent-Type: application/x-www-form-urlencoded"));
+    sprintf(headline,"Content-Length: %u\r\n",strlen(linebuf));
+    EthClient.println(headline);
+    EthClient.print(linebuf);
   } else {
-    Serial.println("connection failed");
+    Serial.println(F("SISE"));
+    lcd.setCursor(15,1);
+    lcd.print("E");
+    return 0;
+  }
+  while(EthClient.connected()) {
+    wdt_reset();
+    while(EthClient.available()) {
+      inChar = EthClient.read();
+      //      Serial.write(inChar);
+      connectLoop = 0;
+    }
+    delay(1);
+    connectLoop++;
+    wdt_reset();
+    if(connectLoop > delayMillis) {
+      lcd.setCursor(15,1);
+      lcd.print("T");
+      EthClient.stop();
+    }
+  }
+  EthClient.stop();
+  lcd.setCursor(15,1);
+  lcd.print(" ");
+  return 1;
+}
+
+void getSHTdata(char *v,int a,int f) {
+  float fv;
+  int ta,tb;
+  switch(a) {
+  case pINAIRTEMP:
+    fv = sht31.readTemperature();
+    if (f==0) {
+      ta = (int)fv;
+      tb = round((double)((fv-ta)*10));
+      if (tb>=10.0) {
+	ta++;
+	tb-=10;
+      }
+      sprintf(v,"%d.%01d",ta,tb);
+    } else {
+      ta = round(fv*pow(10.0,f)) ; // f=2ならば、100倍する
+      sprintf(v,"%d",ta);
+    }
+    break;
+  case pINAIRHUMID:
+    fv = sht31.readHumidity();
+    sprintf(v,"%d",(int)fv);
+    break;
   }
 }
