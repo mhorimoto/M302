@@ -3,8 +3,8 @@
 
 M302KにSHT3xを接続して温度湿度計測を行い、結果をUECS電文で送信する装置。
 
-- Version: A00
-- Release: 02-Jun-2021
+- Version: V042
+- Release: 29-Jul-2021
 - Develop: HOLLY&Co.,Ltd.
 
 ## 必要なH/W
@@ -46,6 +46,7 @@ MACアドレスやUECSID,ROOM,REGIONなどの位置情報の初期値を設定�
 ## 使い方
 
 使い方は、取扱説明書を [main/MANUAL.md](main/MANUAL.md) に記すので、そちらを参照する。
+まだ書かれていない。
 
 ## 著作権
 

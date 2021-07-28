@@ -39,11 +39,12 @@ void get_mcusr(void) {
 #define  pCND        0x43
 #define  delayMillis 5000UL // 5sec
 
-const char VERSION[16] PROGMEM = "\xbd\xcf\xc9\xb3\xbc\xde\xad\xb8 V040";
+const char VERSION[16] PROGMEM = "\xbd\xcf\xc9\xb3\xbc\xde\xad\xb8 V042";
 
 char uecsid[6], uecstext[180],strIP[16],linebuf[80];
 byte lineptr = 0;
 int  sht31addr = 0x44;  // Default SHT31 I2C Address
+unsigned long cndVal;   // CCM cnd Value
 bool enableHeater = false;
 char api[] = "api.smart-agri.jp";
 
@@ -69,7 +70,8 @@ void setup(void) {
   int i;
   const char *ids PROGMEM = "%s:%02X%02X%02X%02X%02X%02X";
   extern void lcdout(int,int,int);
-  
+
+  cndVal = 0L;    // Reset cnd value
   lcd.init();
   lcd.backlight();
   configure_wdt();
@@ -100,6 +102,7 @@ void setup(void) {
       strcpy(lcdtext[3],"NO SHT31 SKIP   ");
       lcdout(0,3,0);
       sht31addr = 0;
+      cndVal |= 0x01000000;   // cnd:Alert=1
     }
   }
   delay(500);
@@ -121,6 +124,7 @@ void setup(void) {
     Udp16520.begin(16520);
   }
   wdt_reset();
+  cndVal |= 0x00000001;  // Setup completed
   delay(1000);
   //
   // Setup Timer1 Interrupt
@@ -221,16 +225,45 @@ void loop() {
     if (sht31addr>0) {
       getSHTdata(&val[0],pINAIRTEMP,1); // 小数点下1桁の整数型
       ia = gisSendData(pINAIRTEMP,16,val);
+      switch(ia) {
+      case 0:
+	cndVal &= 0xffcffeff; // 
+	break;
+      case 1:
+	cndVal |= 0x00100100; // Not connect to Server
+	break;
+      case 2:
+	cndVal |= 0x00200100; // Server response timeout
+	break;
+      }
       wdt_reset();
       getSHTdata(&val[0],pINAIRHUMID,0); // 整数型
       ia = gisSendData(pINAIRHUMID,17,val);
+      switch(ia) {
+      case 0:
+	cndVal &= 0xffcffdff; // 
+	break;
+      case 1:
+	cndVal |= 0x00100200; // Not connect to Server
+	break;
+      case 2:
+	cndVal |= 0x00200200; // Server response timeout
+	break;
+      }
+      cndVal &= 0xffffff0f;  // Reset maintain code
+      ia = Ethernet.maintain();
+      if (ia!=0) {
+	cndVal |= ((ia << 4) & 0xf0);
+      }
     }
   }
   // 1 sec interval
   if (period1sec==1) {
     period1sec = 0;
     ia = pCND;
-    uecsSendData(ia,xmlDT,"0");
+    sprintf(val,"%u",cndVal);
+    uecsSendData(ia,xmlDT,val);
+    cndVal &= 0xfffffffe;            // Clear setup completed flag
   }
   wdt_reset();
 }
@@ -331,7 +364,7 @@ byte gisSendData(int a,int sk,char *val) {
     Serial.println(F("SISE"));
     lcd.setCursor(15,1);
     lcd.print("E");
-    return 0;
+    return 1;
   }
   while(EthClient.connected()) {
     wdt_reset();
@@ -347,12 +380,13 @@ byte gisSendData(int a,int sk,char *val) {
       lcd.setCursor(15,1);
       lcd.print("T");
       EthClient.stop();
+      return 2;
     }
   }
   EthClient.stop();
   lcd.setCursor(15,1);
   lcd.print(" ");
-  return 1;
+  return 0;
 }
 
 void getSHTdata(char *v,int a,int f) {
