@@ -2,7 +2,7 @@
 // M302K-TK01
 //  MIT License
 //  Copyright (c) 2021 Masafumi Horimoto
-//  Release on 05-June-2021
+//  Release on 29-July-2021
 //  https://github.com/mhorimoto/M302.git
 ///////////////////////////////////////////////////////////////////
 
