@@ -29,4 +29,4 @@ fp-info-cache
 *.hex
 *.elf
 lowcore/build/*
-
+M302-backups/*
