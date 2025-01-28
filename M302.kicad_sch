@@ -5,10 +5,10 @@
 	(uuid "9640cd56-837d-4fb5-a0d2-b0d8c1fb49b2")
 	(paper "A4")
 	(title_block
-		(title "M302 Measurement Equipment Type Light")
-		(date "2022-07-05")
-		(rev "1.12")
-		(company "HOLLY&Co.,Ltd.")
+		(title "LY9302 Measurement Equipment Type Light")
+		(date "2025-01-27")
+		(rev "1.0")
+		(company "LSQ")
 		(comment 1 "Use W5500 I/F for LAN networking")
 		(comment 2 "Use IM920 I/F for Radio connection")
 		(comment 3 "Analog Input 4ch available")
@@ -5521,7 +5521,6 @@
 	)
 	(label "A2"
 		(at 132.08 170.18 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5532,7 +5531,6 @@
 	)
 	(label "6(**)"
 		(at 190.5 111.76 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5543,7 +5541,6 @@
 	)
 	(label "A3"
 		(at 132.08 175.26 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5554,7 +5551,6 @@
 	)
 	(label "3(**)"
 		(at 190.5 119.38 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5565,7 +5561,6 @@
 	)
 	(label "5(**)"
 		(at 190.5 114.3 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5576,7 +5571,6 @@
 	)
 	(label "12(MISO)"
 		(at 190.5 93.98 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5587,7 +5581,6 @@
 	)
 	(label "8"
 		(at 190.5 104.14 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5598,7 +5591,6 @@
 	)
 	(label "Reset"
 		(at 142.24 96.52 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5609,7 +5601,6 @@
 	)
 	(label "A5(SCL)"
 		(at 190.5 81.28 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5620,7 +5611,6 @@
 	)
 	(label "1(Tx)"
 		(at 190.5 124.46 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5631,7 +5621,6 @@
 	)
 	(label "AREF"
 		(at 190.5 86.36 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5642,7 +5631,6 @@
 	)
 	(label "13(SCK)"
 		(at 190.5 91.44 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5653,7 +5641,6 @@
 	)
 	(label "2"
 		(at 190.5 121.92 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5664,7 +5651,6 @@
 	)
 	(label "IOREF"
 		(at 160.02 87.63 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5675,7 +5661,6 @@
 	)
 	(label "Vin"
 		(at 149.86 87.63 90)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5686,7 +5671,6 @@
 	)
 	(label "A0"
 		(at 132.08 160.02 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5697,7 +5681,6 @@
 	)
 	(label "7"
 		(at 190.5 109.22 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5708,7 +5691,6 @@
 	)
 	(label "10(**/SS)"
 		(at 190.5 99.06 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5719,7 +5701,6 @@
 	)
 	(label "0(Rx)"
 		(at 190.5 127 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5730,7 +5711,6 @@
 	)
 	(label "9(**)"
 		(at 190.5 101.6 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5741,7 +5721,6 @@
 	)
 	(label "A4(SDA)"
 		(at 190.5 83.82 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5752,7 +5731,6 @@
 	)
 	(label "A1"
 		(at 132.08 165.1 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5763,7 +5741,6 @@
 	)
 	(label "4"
 		(at 190.5 116.84 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -5774,7 +5751,6 @@
 	)
 	(label "11(**/MOSI)"
 		(at 190.5 96.52 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.524 1.524)
